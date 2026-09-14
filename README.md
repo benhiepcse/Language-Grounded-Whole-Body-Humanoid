@@ -6,8 +6,8 @@
 - **Tên project:** Language-Grounded Whole-Body Humanoid
 - **Thời gian:** Tuần 17–22, từ **04/01/2027 đến 14/02/2027**
 - **Hướng phát triển:** Humanoid AI Perception kết hợp Humanoid Robot Control & Simulation
-- **Thành viên A:** NLP, LLM, Generative AI, Vision-Language Model, Computer Vision và semantic perception
-- **Thành viên B:** Modern Robotics, ROS 2, MoveIt 2, motion planning, whole-body control và simulation
+- **Hiệp (Thành viên A):** NLP, LLM, Generative AI, Vision-Language Model, Computer Vision và semantic perception
+- **Thông (Thành viên B):** Modern Robotics, ROS 2, MoveIt 2, motion planning, whole-body control và simulation
 - **Điểm xuất phát:** Kế thừa robot description, TF, simulator và joint controllers từ P01; kế thừa detections, tracks, state estimate, safety state và evaluation infrastructure từ P02.
 
 ## 2. Mục tiêu, phạm vi và tiêu chí kết thúc
@@ -455,6 +455,14 @@ p03_language_grounded_whole_body_humanoid/
 
 Model cuối không được chọn chỉ bằng accuracy. Quyết định phải xem đồng thời schema validity, calibration, ambiguity/refusal correctness, inference latency, GPU memory, license và khả năng fallback.
 
+### 5.1. Quy ước nguồn YouTube của Hiệp
+
+- Toàn bộ nguồn PDF/PPTX cũ của Hiệp trong P03 đã được thay bằng lecture/course YouTube phù hợp với đúng nội dung cần áp dụng.
+- Các link dưới đây đều là video bài giảng hoặc technical talk riêng lẻ, vì vậy Hiệp học **toàn bộ video**; không cần cắt timestamp từ một video full-course dài.
+- Nếu sau này thay một nguồn bằng video full-course kiểu freeCodeCamp, tài liệu phải ghi cả khoảng `HH:MM:SS–HH:MM:SS` và số giây `Xs–Ys` trước khi giao nhiệm vụ.
+- Documentation/repository chính thức đi kèm model vẫn được giữ để tra API và kiểm chứng triển khai; chúng không thay thế video học lý thuyết.
+- Nguồn chính thức của Thông về Modern Robotics, ROS 2, MoveIt 2, Stack of Tasks và ros2_control được giữ nguyên.
+
 ## 6. Backlog theo thứ tự phát triển
 
 ### [P03-I01] — Khóa language-to-motion contract
@@ -462,7 +470,8 @@ Model cuối không được chọn chỉ bằng accuracy. Quyết định phả
 - **Thực hiện:** Cả hai.
 - **Mô tả:** Hai thành viên thống nhất supported command set, scene graph schema, `GroundedTask`, ROS action và error taxonomy trước khi huấn luyện model hoặc viết planner. Contract phải tách free-form language khỏi control, định nghĩa rõ trust boundary và quy định stale/confidence/workspace/safety gates. Đây là mốc kiến trúc bắt buộc để mọi module AI và control phát triển độc lập nhưng ghép được bằng cùng schema.
 - **Kiến thức:**
-  - Tích hợp Generative AI với hệ thống khác — `AI-GenAI-CH06.1.pdf`, `AI-GenAI-CH06.2.pdf`.
+  - Thiết kế prompt, instruction boundary và output có kiểm soát trong hệ thống LLM — [Stanford CS224N 2023, Lecture 10 — Prompting and RLHF](https://www.youtube.com/watch?v=SXpJ9EmG3s4) — học toàn bộ video.
+  - Kiểm tra output, benchmark và failure criteria trước khi tích hợp — [Stanford CS224N Spring 2024, Lecture 11 — Benchmarking](https://www.youtube.com/watch?v=TO0CqzqiArM) — học toàn bộ video.
   - ROS 2 action server/client — [ROS 2 Jazzy action tutorial](https://docs.ros.org/en/jazzy/Tutorials/Intermediate/Writing-an-Action-Server-Client/Py.html).
 - **Input → Output:** P02 interfaces + năm canonical skills → architecture, language contract, messages/action và launch skeleton.
 - **Test:** Serialize/deserialize valid goal; reject unknown action; reject missing frame/timestamp.
@@ -477,11 +486,11 @@ Model cuối không được chọn chỉ bằng accuracy. Quyết định phả
 
 ### [P03-A01] — Xây command corpus và evaluation protocol
 
-- **Thực hiện:** Thành viên A.
+- **Thực hiện:** Hiệp.
 - **Mô tả:** Tạo corpus gồm canonical commands, paraphrases, negative/unsupported commands, ambiguous references và expected structured tasks. Split theo scene/template family để cùng một paraphrase pattern không rò rỉ giữa train và test. Dataset bytes nằm ngoài Git; repository chỉ giữ manifest, task catalog, checksum và protocol đánh giá.
 - **Kiến thức:**
-  - Tổng quan NLP và biểu diễn đầu vào — `Chap 2.1.pptx`, `Chap 2.2.pptx`, `Chap 2.3.pptx`.
-  - Giới thiệu LLM — `AI-LLM-CH01.1.pdf`, `AI-LLM-CH01.2.pdf`, `AI-LLM-CH01.3.pdf`.
+  - Tổng quan NLP, token/word representation và word vectors — [Stanford CS224N Spring 2024, Lecture 1 — Intro and Word Vectors](https://www.youtube.com/watch?v=DzpHeXVSC5I) — học toàn bộ video.
+  - Nền tảng language model và ba họ decoder, encoder, encoder-decoder — [Stanford CS224N 2023, Lecture 9 — Pretraining](https://www.youtube.com/watch?v=DGfCRXuNA2w) — học toàn bộ video.
 - **Input mẫu:** `"Hãy nhìn vào chiếc hộp đỏ ở bên trái cái cốc."`
 - **Output mẫu:** `{action: LOOK_AT, target: {class: box, color: red, relation: left_of(cup)}, valid: true}`.
 - **Các file thực hiện:**
@@ -495,7 +504,7 @@ Model cuối không được chọn chỉ bằng accuracy. Quyết định phả
 
 ### [P03-B01] — Cấu hình MoveIt cho fixed-foot whole body
 
-- **Thực hiện:** Thành viên B.
+- **Thực hiện:** Thông.
 - **Mô tả:** Mở rộng robot model kế thừa P01 thành semantic model dùng được bởi MoveIt. SRDF phải có head, torso, left arm, right arm và composite upper/whole-body groups; named pose `neutral`; end-effector frames; collision matrix chỉ tắt các cặp đã xác minh. Nhiệm vụ kiểm tra IK, planning scene và controller mapping trước khi có language model.
 - **Kiến thức:**
   - Motion Planning — [Modern Robotics, Chapter 10](https://modernrobotics.northwestern.edu/nu-gm-book-resource/chapter-10-autoplay/).
@@ -514,11 +523,11 @@ Model cuối không được chọn chỉ bằng accuracy. Quyết định phả
 
 ### [P03-A02] — Xây semantic scene graph từ P02 tracks
 
-- **Thực hiện:** Thành viên A.
+- **Thực hiện:** Hiệp.
 - **Mô tả:** Chuyển object tracks thành graph gồm object nodes, attributes và quan hệ `left_of`, `right_of`, `near`, `in_front_of`, `behind`. Track ID là identity chính; class/màu/pose chỉ là thuộc tính có confidence và timestamp. Graph phải xử lý target mất, object trùng class và frame transform thất bại mà không sinh reference giả.
 - **Kiến thức:**
-  - Graph Neural Network — `AI-ADL-CH04.1.pdf`, `AI-ADL-CH04.2.pdf`, `AI-ADL-CH04.3.pdf`.
-  - Biểu diễn dữ liệu graph — `AI-ADL-CH05.1.pdf`, `AI-ADL-CH05.2.pdf`.
+  - Biểu diễn graph, message passing và node classification — [Stanford CS224W 2021, Lecture 5.1 — Message Passing and Node Classification](https://www.youtube.com/watch?v=6g9vtxUmfwM) — học toàn bộ video.
+  - Kiến trúc và nguyên lý Graph Neural Network — [Stanford CS224W 2021, Lecture 6.1 — Introduction to Graph Neural Networks](https://www.youtube.com/watch?v=F3PgltDzllc) — học toàn bộ video.
 - **Input → Output:** `TrackedObjectArray` + RGB attributes → `SceneGraph` trong `base_link`.
 - **Các file thực hiện:**
   - `src/p03_core/perception/scene_graph.py` — graph construction, relations, lifecycle và freshness.
@@ -530,7 +539,7 @@ Model cuối không được chọn chỉ bằng accuracy. Quyết định phả
 ### [P03-I02] — Đồng bộ scene graph với MoveIt planning scene
 
 - **Thực hiện:** Cả hai.
-- **Mô tả:** Thành viên A cung cấp semantic object ID/pose/shape; Thành viên B chuyển các object đủ tin cậy thành collision objects trong MoveIt. Cùng một `track_id` phải ánh xạ nhất quán sang planning scene ID, update theo timestamp và bị remove sau stale timeout. Mốc này chứng minh perception context vừa phục vụ ngôn ngữ vừa phục vụ collision checking.
+- **Mô tả:** Hiệp cung cấp semantic object ID/pose/shape; Thông chuyển các object đủ tin cậy thành collision objects trong MoveIt. Cùng một `track_id` phải ánh xạ nhất quán sang planning scene ID, update theo timestamp và bị remove sau stale timeout. Mốc này chứng minh perception context vừa phục vụ ngôn ngữ vừa phục vụ collision checking.
 - **Kiến thức:**
   - Planning Scene ROS API — [MoveIt 2 Planning Scene ROS API tutorial](https://moveit.picknik.ai/main/doc/examples/planning_scene_ros_api/planning_scene_ros_api_tutorial.html).
 - **Input → Output:** `/semantic/scene_graph` → MoveIt `PlanningScene` collision objects.
@@ -544,14 +553,11 @@ Model cuối không được chọn chỉ bằng accuracy. Quyết định phả
 
 ### [P03-A03] — Baseline intent và slot filling bằng RNN/LSTM/GRU
 
-- **Thực hiện:** Thành viên A.
+- **Thực hiện:** Hiệp.
 - **Mô tả:** Xây ba sequence baselines dùng cùng tokenizer, split và output schema để dự đoán action, effector và entity attributes. So sánh vanilla RNN, LSTM và GRU về exact match, slot F1, latency và memory. Baseline tốt nhất phải calibrate confidence và trả ambiguity thay vì ép dự đoán khi command thiếu target.
 - **Kiến thức:**
-  - RNN structure — `3.1.pptx`.
-  - LSTM và GRU — `3.2.pptx`.
-  - Sequence applications — `3.3.pptx`.
-  - CNN/RNN applications cho short/long text — `4.1.pptx`, `4.2.pptx`, `4.3.pptx`.
-  - Recurrent Neural Networks — `AI-ADL-CH03.1.pdf`, `AI-ADL-CH03.2.pdf`, `AI-ADL-CH03.3.pdf`.
+  - RNN, sequence modeling, vanishing gradient và language modeling — [Stanford CS224N Spring 2024, Lecture 5 — Recurrent Neural Networks](https://www.youtube.com/watch?v=fyc0Jzr74y4) — học toàn bộ video.
+  - LSTM/GRU và cách giữ thông tin dài hạn — [Stanford CS224N Winter 2021, Lecture 5 — Recurrent Neural Networks](https://www.youtube.com/watch?v=PLryWeHPcBs) — học phần RNN/LSTM của video; đây là lecture riêng, không phải full-course ghép chương.
 - **Input → Output:** normalized tokens → `LanguageIntent` + calibrated confidence.
 - **Các file thực hiện:**
   - `src/p03_core/language/normalization.py` — text normalization/synonyms.
@@ -563,16 +569,13 @@ Model cuối không được chọn chỉ bằng accuracy. Quyết định phả
 
 ### [P03-A04] — Structured parser bằng Seq2Seq, Attention và Transformer
 
-- **Thực hiện:** Thành viên A.
+- **Thực hiện:** Hiệp.
 - **Mô tả:** Nâng từ classifier nhiều head lên text-to-structured-task. Model phải sinh đúng schema action-effector-target-constraints và dùng constrained decoding/validator để JSON sai không đi tiếp. So sánh Seq2Seq không attention, attention model và Transformer; chỉ chấp nhận model cải thiện valid-schema rate mà không vượt latency budget.
 - **Kiến thức:**
-  - Seq2Seq — `5.1.pptx`.
-  - Attention — `5.2.pptx`.
-  - Dịch máy/tóm tắt bằng Seq2Seq — `5.3.pptx`.
-  - Transformer architecture — `6.1.pptx`.
-  - Transformer applications — `6.2.pptx`.
-  - BERT/GPT và language model evaluation — `7.1.pptx`, `7.2.pptx`, `7.3.pptx`.
-  - Từ Transformer đến ChatGPT; Autoencoding và Autoregressive — `AI-LLM-CH02.1.pdf`, `AI-LLM-CH02.2.pdf`.
+  - Seq2Seq, Attention và LLM introduction — [Stanford CS224N Spring 2024, Lecture 7 — Attention, Final Projects and LLM Intro](https://www.youtube.com/watch?v=J7ruSOIzhrE) — học toàn bộ video.
+  - Self-Attention và Transformer architecture — [Stanford CS224N 2023, Lecture 8 — Self-Attention and Transformers](https://www.youtube.com/watch?v=LWMzyfvuehA) — học toàn bộ video.
+  - Encoder-only, decoder-only, encoder-decoder và pretraining — [Stanford CS224N 2023, Lecture 9 — Pretraining](https://www.youtube.com/watch?v=DGfCRXuNA2w) — học toàn bộ video.
+  - Đánh giá language model và benchmark design — [Stanford CS224N Spring 2024, Lecture 11 — Benchmarking](https://www.youtube.com/watch?v=TO0CqzqiArM) — học toàn bộ video.
 - **Input → Output:** command → validated structured task hoặc explicit parse error.
 - **Các file thực hiện:**
   - `src/p03_core/language/structured_parser.py` — parser, constrained schema và validator.
@@ -584,7 +587,7 @@ Model cuối không được chọn chỉ bằng accuracy. Quyết định phả
 
 ### [P03-B02] — Goal validation và skill graph
 
-- **Thực hiện:** Thành viên B.
+- **Thực hiện:** Thông.
 - **Mô tả:** Xây trust boundary nhận structured task và robot/environment state rồi quyết định accept/reject. Task hợp lệ được biên dịch thành skill sequence có precondition/postcondition, ví dụ `resolve_target → look_at → point → hold → return_neutral`. Validator kiểm tra target freshness, coordinate frame, workspace, effector, safety và skill availability trước planning.
 - **Kiến thức:**
   - Motion Planning — [Modern Robotics, Chapter 10](https://modernrobotics.northwestern.edu/nu-gm-book-resource/chapter-10-autoplay/).
@@ -614,11 +617,11 @@ Model cuối không được chọn chỉ bằng accuracy. Quyết định phả
 
 ### [P03-A05] — Visual grounding baseline bằng CLIP và ViLT
 
-- **Thực hiện:** Thành viên A.
+- **Thực hiện:** Hiệp.
 - **Mô tả:** Dùng CLIP-style text-image similarity để xếp hạng các object crops, sau đó so sánh với ViLT cho grounding/retrieval trên cùng candidate set. Geometric relations từ scene graph được dùng như constraint, không thay thế visual score. Nhiệm vụ phải đo top-1/top-k, calibration, latency và lỗi khi có hai object cùng class/màu.
 - **Kiến thức:**
-  - CLIP — `2103.00020.pdf`; [OpenAI CLIP repository](https://github.com/openai/CLIP).
-  - ViLT — `2102.03334.pdf`.
+  - Contrastive vision-language pretraining, CLIP-style shared embedding và retrieval — [Stanford CS224N 2023, Lecture 16 — Multimodal Deep Learning](https://www.youtube.com/watch?v=5vfIT5LOkR0) — học toàn bộ video; [OpenAI CLIP repository](https://github.com/openai/CLIP) dùng để tra implementation.
+  - Image-text pretraining và vision-language Transformer, gồm hướng tiếp cận không dựa vào region features như ViLT — [CVPR 2022 VLP Tutorial — Image-Text Pre-training Part I](https://www.youtube.com/watch?v=ce4lIytxfIo) — học toàn bộ video.
 - **Input → Output:** text target + object crops/metadata → ranked track IDs + confidence.
 - **Các file thực hiện:**
   - `src/p03_core/multimodal/adapters.py` — CLIP/ViLT adapters.
@@ -630,11 +633,11 @@ Model cuối không được chọn chỉ bằng accuracy. Quyết định phả
 
 ### [P03-A06] — Caption/VQA grounding bằng BLIP và BLIP-2
 
-- **Thực hiện:** Thành viên A.
+- **Thực hiện:** Hiệp.
 - **Mô tả:** Bổ sung BLIP và BLIP-2 adapters để kiểm tra khi nào caption/VQA giúp phân biệt object hoặc attribute mà similarity model bỏ sót. Output text phải được parse qua schema/closed vocabulary; câu trả lời không ánh xạ được tới một candidate track sẽ bị reject. Chỉ chọn model nếu cải thiện grounding đủ lớn so với compute cost.
 - **Kiến thức:**
-  - BLIP — `2201.12086.pdf`.
-  - BLIP-2 — `2301.12597.pdf`.
+  - Captioning, VQA và các họ BLIP/Flamingo/LLaVA — [Introduction to Vision Language Models](https://www.youtube.com/watch?v=2JairFgKPb4) — học toàn bộ video.
+  - BLIP-2 inference và Q-Former trong thực hành — [How to Get Started with BLIP-2 — Vision Language Model Tutorial](https://www.youtube.com/watch?v=uOwuvC374Co) — học toàn bộ video.
   - Image-text-to-text task — [Hugging Face Transformers](https://huggingface.co/docs/transformers/tasks/image_text_to_text).
 - **Input → Output:** image/region + constrained question + candidates → answer + grounded track/confidence.
 - **Các file thực hiện:**
@@ -647,7 +650,7 @@ Model cuối không được chọn chỉ bằng accuracy. Quyết định phả
 
 ### [P03-B03] — Lập kế hoạch look, point và reach
 
-- **Thực hiện:** Thành viên B.
+- **Thực hiện:** Thông.
 - **Mô tả:** Triển khai planning adapter cho ba skill. `look_at` tạo head/neck orientation constraint; `point` đưa hand/tool axis hướng tới target với khoảng cách an toàn; `reach` tạo end-effector pose goal. Planner phải dùng planning scene, joint/pose constraints, workspace và fallback profile, sau đó validate trajectory trước execution.
 - **Kiến thức:**
   - Motion Planning — [Modern Robotics, Chapter 10](https://modernrobotics.northwestern.edu/nu-gm-book-resource/chapter-10-autoplay/).
@@ -662,7 +665,7 @@ Model cuối không được chọn chỉ bằng accuracy. Quyết định phả
 
 ### [P03-B04] — Task-priority whole-body controller
 
-- **Thực hiện:** Thành viên B.
+- **Thực hiện:** Thông.
 - **Mô tả:** Xây controller phối hợp head, torso và hai arms dưới fixed-foot constraints. Thứ tự ưu tiên bắt buộc là safety/joint limits, fixed feet và upright torso, task-space end-effector/head, posture/neutral. Null-space projection hoặc QP-like hierarchy phải có singularity damping, velocity/effort saturation và deterministic hold. Đây là control trung tâm của P03, không phải wrapper MoveIt.
 - **Kiến thức:**
   - Robot Control — [Modern Robotics, Chapter 11](https://modernrobotics.northwestern.edu/nu-gm-book-resource/chapter-11-autoplay/).
@@ -681,7 +684,7 @@ Model cuối không được chọn chỉ bằng accuracy. Quyết định phả
 ### [P03-I04] — Grounded target đến whole-body execution
 
 - **Thực hiện:** Cả hai.
-- **Mô tả:** Cho phép một grounded task hợp lệ chạy xuyên suốt task executive, MoveIt và whole-body controller trong Gazebo. Thành viên A chịu trách nhiệm target/evidence đúng và cập nhật; Thành viên B chịu trách nhiệm plan/execution/safety. Test phải bao gồm target rõ, target ambiguous, target ngoài workspace và `danger` xuất hiện giữa chuyển động.
+- **Mô tả:** Cho phép một grounded task hợp lệ chạy xuyên suốt task executive, MoveIt và whole-body controller trong Gazebo. Hiệp chịu trách nhiệm target/evidence đúng và cập nhật; Thông chịu trách nhiệm plan/execution/safety. Test phải bao gồm target rõ, target ambiguous, target ngoài workspace và `danger` xuất hiện giữa chuyển động.
 - **Interface:** `/language/grounded_task` → `/whole_body/execute_task` → MoveIt trajectory → controller feedback/result.
 - **Các file thực hiện:**
   - `ros2_ws/src/p03_runtime/p03_runtime/task_executive_node.py` — full action lifecycle/cancel/rollback.
@@ -693,12 +696,11 @@ Model cuối không được chọn chỉ bằng accuracy. Quyết định phả
 
 ### [P03-A07] — Benchmark encoder-only, encoder-decoder và decoder-only parser
 
-- **Thực hiện:** Thành viên A.
+- **Thực hiện:** Hiệp.
 - **Mô tả:** Đóng gói ba họ LLM dưới cùng structured parser interface. Encoder-only dùng cho intent/entity heads; encoder-decoder sinh task schema; decoder-only dùng few-shot constrained output. Benchmark phải giải thích chính xác model nào phù hợp cho corpus, không mặc định model lớn nhất tốt nhất.
 - **Kiến thức:**
-  - Encoder-only models — `AI-LLM-CH03.1.pdf`, `AI-LLM-CH03.2.pdf`, `AI-LLM-CH03.3.pdf`.
-  - Encoder-decoder models — `AI-LLM-CH04.1.pdf`, `AI-LLM-CH04.2.pdf`, `AI-LLM-CH04.3.pdf`.
-  - Decoder-only models — `AI-LLM-CH05.1.pdf`, `AI-LLM-CH05.2.pdf`, `AI-LLM-CH05.3.pdf`.
+  - Encoder-only, encoder-decoder và decoder-only model families — [Stanford CS224N 2023, Lecture 9 — Pretraining](https://www.youtube.com/watch?v=DGfCRXuNA2w) — học toàn bộ video.
+  - Transformer foundation dùng chung cho ba họ model — [Stanford CS224N 2023, Lecture 8 — Self-Attention and Transformers](https://www.youtube.com/watch?v=LWMzyfvuehA) — học toàn bộ video.
   - Transformers model APIs — [Hugging Face Transformers documentation](https://huggingface.co/docs/transformers/index).
 - **Input → Output:** locked command test set → comparable models, metrics và decision record.
 - **Các file thực hiện:**
@@ -711,11 +713,12 @@ Model cuối không được chọn chỉ bằng accuracy. Quyết định phả
 
 ### [P03-A08] — Prompting/PEFT và production-safe structured output
 
-- **Thực hiện:** Thành viên A.
+- **Thực hiện:** Hiệp.
 - **Mô tả:** Tối ưu parser/VLM bằng prompt template, few-shot examples hoặc PEFT nếu dữ liệu và compute cho phép. Mọi output phải qua constrained schema, allowlist action và validator; prompt injection, request ngoài scope và yêu cầu bỏ safety phải bị từ chối. Model registry lưu base model, adapter hash, prompt version và license.
 - **Kiến thức:**
-  - Prompting như parameter-efficient fine-tuning — `AI-LLM-CH06.1.pdf`, `AI-LLM-CH06.2.pdf`, `AI-LLM-CH06.3.pdf`.
-  - Đánh giá và tinh chỉnh mô hình Generative AI — `AI-GenAI-CH04.1.pdf`, `AI-GenAI-CH04.2.pdf`.
+  - Prompting, instruction fine-tuning và alignment/RLHF — [Stanford CS224N 2023, Lecture 10 — Prompting and RLHF](https://www.youtube.com/watch?v=SXpJ9EmG3s4) — học toàn bộ video.
+  - PEFT/LoRA và efficient adaptation — [Stanford CS224N Spring 2024 — Efficient Training, Shikhar Murty](https://www.youtube.com/watch?v=UVX7SYGCKkA) — học toàn bộ video.
+  - Benchmark và đánh giá mô hình sinh — [Stanford CS224N Spring 2024, Lecture 11 — Benchmarking](https://www.youtube.com/watch?v=TO0CqzqiArM) — học toàn bộ video.
 - **Input → Output:** instruction corpus + base model → versioned parser adapter/prompt và robustness report.
 - **Các file thực hiện:**
   - `src/p03_core/multimodal/training.py` — PEFT/prompt experiment flow.
@@ -727,14 +730,14 @@ Model cuối không được chọn chỉ bằng accuracy. Quyết định phả
 
 ### [P03-A09] — Multimodal instruction benchmark
 
-- **Thực hiện:** Thành viên A.
+- **Thực hiện:** Hiệp.
 - **Mô tả:** So sánh Flamingo, MiniGPT-4, LLaVA và PaliGemma theo khả năng image-text-to-text có cấu trúc trên các scene của project. Đây là benchmark có kiểm soát, không bắt buộc fine-tune tất cả model. Mỗi model dùng adapter, prompt budget và output validator tương đương; model quá lớn không chạy được phải được ghi rõ resource constraint thay vì bịa metric.
 - **Kiến thức:**
-  - Flamingo — `2204.14198.pdf`.
-  - MiniGPT-4 — `2304.08485.pdf`.
-  - Improved Baselines with Visual Instruction Tuning/LLaVA — `2310.03744.pdf`.
-  - PaliGemma — `2407.07726.pdf`.
-  - Multimodal Large Models — `AI-LLM-CH07.1.pdf`, `AI-LLM-CH07.2.pdf`, `AI-LLM-CH07.3.pdf`.
+  - Nền tảng multimodal learning, CLIP-style alignment và VLM — [Stanford CS224N 2023, Lecture 16 — Multimodal Deep Learning](https://www.youtube.com/watch?v=5vfIT5LOkR0) — học toàn bộ video.
+  - Flamingo, BLIP và LLaVA-style multimodal architecture — [Introduction to Vision Language Models](https://www.youtube.com/watch?v=2JairFgKPb4) — học toàn bộ video.
+  - Visual instruction tuning và LLaVA — [LLaVA: the First Instruction-Following Multimodal Model — paper explained](https://www.youtube.com/watch?v=GMOREHJTbR4) — học toàn bộ video.
+  - PaliGemma architecture và vision encoder integration — [PaliGemma: Making Gemma 2 See — Google for Developers](https://www.youtube.com/watch?v=S2C5rZ9WG-U) — học toàn bộ video.
+  - Xu hướng native multimodal intelligence và tiêu chí so sánh VLM — [Stanford CS25 Transformers United V6 — From Language Models to Native Multimodal Intelligence](https://www.youtube.com/watch?v=NDdc39KYqDU) — học toàn bộ video.
   - Image-text-to-text — [Hugging Face task guide](https://huggingface.co/docs/transformers/tasks/image_text_to_text).
 - **Input → Output:** RGB scene + instruction + candidate graph → structured grounded task hoặc refusal.
 - **Các file thực hiện:**
@@ -747,11 +750,11 @@ Model cuối không được chọn chỉ bằng accuracy. Quyết định phả
 
 ### [P03-A10] — Embodied context bằng PaLM-E-style schema
 
-- **Thực hiện:** Thành viên A.
+- **Thực hiện:** Hiệp.
 - **Mô tả:** Nghiên cứu PaLM-E và thiết kế embodied input adapter kết hợp visual context, robot state summary và natural-language instruction. P03 không tái huấn luyện PaLM-E; nhiệm vụ áp dụng nguyên lý embodied multimodal input vào schema nội bộ và đo việc thêm reachability/safety context có giảm invalid grounded tasks hay không.
 - **Kiến thức:**
-  - PaLM-E: An Embodied Multimodal Language Model — `2303.03378.pdf`.
-  - Một số mô hình và tạo sinh nội dung — `AI-GenAI-CH02.1.pdf`, `AI-GenAI-CH02.2.pdf`, `AI-GenAI-CH03.1.pdf`, `AI-GenAI-CH03.2.pdf`, `AI-GenAI-CH03.3.pdf`.
+  - PaLM-E, embodied multimodal input và robot-state conditioning — [Google PaLM-E: An Embodied Multimodal Language Model](https://www.youtube.com/watch?v=fiLFF4RyyKQ) — học toàn bộ video.
+  - Multimodal generation và cách kết hợp vision encoder với language model — [Stanford CS25 Transformers United V6 — From Language Models to Native Multimodal Intelligence](https://www.youtube.com/watch?v=NDdc39KYqDU) — học toàn bộ video.
 - **Input → Output:** scene summary + robot reachability/safety state + command → grounded task with embodied constraints.
 - **Các file thực hiện:**
   - `src/p03_core/multimodal/inference.py` — embodied context serialization.
@@ -763,7 +766,7 @@ Model cuối không được chọn chỉ bằng accuracy. Quyết định phả
 
 ### [P03-B05] — Realtime servo và hybrid replanning cho target động
 
-- **Thực hiện:** Thành viên B.
+- **Thực hiện:** Thông.
 - **Mô tả:** Bổ sung online servo cho target di chuyển chậm và hybrid planning để global plan có thể cập nhật local motion. Servo chỉ dùng grounded target còn fresh và phải giảm tốc mượt khi target mất; không được tiếp tục đuổi pose cuối vô thời hạn. Safety, collision và joint-limit constraints luôn có quyền ưu tiên.
 - **Kiến thức:**
   - MoveIt Servo — [MoveIt 2 Realtime Servo tutorial](https://moveit.picknik.ai/main/doc/examples/realtime_servo/realtime_servo_tutorial.html).
@@ -780,7 +783,7 @@ Model cuối không được chọn chỉ bằng accuracy. Quyết định phả
 
 ### [P03-B06] — Manipulation-oriented point/reach execution
 
-- **Thực hiện:** Thành viên B.
+- **Thực hiện:** Thông.
 - **Mô tả:** Hoàn thiện geometric conventions của hand frame và execution semantics cho `point`, `reach`, `hold_pose`, `return_neutral`. `Point` phải duy trì khoảng cách an toàn; `reach` chỉ chạm vùng cho phép trong simulation; mọi skill có precondition, success tolerance, timeout và recovery. Grasp closure chỉ là task nâng cao nếu còn thời gian.
 - **Kiến thức:**
   - Grasping and Manipulation — [Modern Robotics, Chapter 12](https://modernrobotics.northwestern.edu/nu-gm-book-resource/chapter-12-autoplay/).
@@ -799,8 +802,9 @@ Model cuối không được chọn chỉ bằng accuracy. Quyết định phả
 - **Thực hiện:** Cả hai.
 - **Mô tả:** Chạy full pipeline trên năm scenarios và đóng băng release candidate. Mỗi run phải lưu command, synchronized evidence, selected target, grounded task, plan, joint state/action, safety events, result và model/config hashes. Acceptance report phân tách semantic failure, planning failure, control failure và safety intervention để P04 có dữ liệu sạch.
 - **Kiến thức:**
-  - Đạo đức và trách nhiệm xã hội của Generative AI — `AI-GenAI-CH05.1.pdf`, `AI-GenAI-CH05.2.pdf`.
-  - Tích hợp Generative AI — `AI-GenAI-CH06.1.pdf`, `AI-GenAI-CH06.2.pdf`.
+  - Taxonomy rủi ro và trách nhiệm khi dùng language model — [Taxonomy of Risks Posed by Language Models](https://www.youtube.com/watch?v=YyE-chqnCdA) — học toàn bộ video.
+  - Tích hợp output LLM an toàn bằng prompt contract, validator và refusal — [Stanford CS224N 2023, Lecture 10 — Prompting and RLHF](https://www.youtube.com/watch?v=SXpJ9EmG3s4) — học toàn bộ video.
+  - Đánh giá input/output và khóa acceptance benchmark — [Stanford CS224N Spring 2024, Lecture 11 — Benchmarking](https://www.youtube.com/watch?v=TO0CqzqiArM) — học toàn bộ video.
 - **Input → Output:** command + simulated scene → safe whole-body execution + episode record + verification report.
 - **Các file thực hiện:**
   - `ros2_ws/src/p03_bringup/launch/language_grounded_humanoid.launch.py` — release launch graph.
@@ -815,10 +819,11 @@ Model cuối không được chọn chỉ bằng accuracy. Quyết định phả
 
 ### [P03-A11] — Final semantic benchmark và failure analysis
 
-- **Thực hiện:** Thành viên A.
+- **Thực hiện:** Hiệp.
 - **Mô tả:** Đóng băng active/fallback language và multimodal models, chạy lại locked test set và phân loại lỗi theo intent, attribute, relation, ambiguity, hallucination, stale evidence và domain shift. Không tuning trên test set. Báo cáo phải ghi rõ command/object classes không hỗ trợ và đề xuất dữ liệu cần thu cho P04.
 - **Kiến thức:**
-  - Giới thiệu, mô hình và đánh giá Generative AI — `AI-GenAI-CH01.1.pdf`, `AI-GenAI-CH01.2.pdf`, `AI-GenAI-CH04.1.pdf`, `AI-GenAI-CH04.2.pdf`.
+  - Nền tảng language generation và các lựa chọn mô hình sinh — [Stanford CS224N 2023, Lecture 11 — Natural Language Generation](https://www.youtube.com/watch?v=N9L32bFieEY) — học toàn bộ video.
+  - Benchmark, judge, failure slice và cách khóa evaluation protocol — [Stanford CS224N Spring 2024, Lecture 11 — Benchmarking](https://www.youtube.com/watch?v=TO0CqzqiArM) — học toàn bộ video.
 - **Các file thực hiện:**
   - `models/registry.json` — promote active/fallback model versions.
   - `src/p03_core/evaluation/metrics.py` — locked semantic metrics/error taxonomy.
@@ -829,7 +834,7 @@ Model cuối không được chọn chỉ bằng accuracy. Quyết định phả
 
 ### [P03-B07] — Final planning/control benchmark và release hardening
 
-- **Thực hiện:** Thành viên B.
+- **Thực hiện:** Thông.
 - **Mô tả:** Chạy benchmark planning success, path length, planning latency, pose error, joint tracking error, limit margin, collision count và stop latency. Kiểm tra lifecycle restart, action cancel, planner/controller timeout và simulation reset. Chỉ release khi system fail-safe trước mọi lỗi bắt buộc.
 - **Kiến thức:**
   - Robot Control — [Modern Robotics, Chapter 11](https://modernrobotics.northwestern.edu/nu-gm-book-resource/chapter-11-autoplay/).
@@ -845,14 +850,14 @@ Model cuối không được chọn chỉ bằng accuracy. Quyết định phả
 
 ## 7. Lịch tuần 17–22
 
-| Tuần | Thời gian | Kiến thức và nguồn cần hoàn thành | Thành viên A | Thành viên B | Tích hợp/Deliverable | Giờ dự kiến |
+| Tuần | Thời gian | Kiến thức và nguồn cần hoàn thành | Hiệp | Thông | Tích hợp/Deliverable | Giờ dự kiến |
 |---:|---|---|---|---|---|---|
-| 17 | 04/01–10/01/2027 | NLP Ch.2; LLM Ch.1; ADL graph; Modern Robotics Ch.10; MoveIt planning | A01, A02 | B01 | I01; contract v1, corpus manifest, scene graph và MoveIt groups | A: 20h, B: 20h |
-| 18 | 11/01–17/01/2027 | NLP Ch.3–7; ADL RNN; ROS actions; MoveIt Planning Scene | A03, A04 | B02 | I02; scene graph đồng bộ collision scene, parsers có schema | A: 22h, B: 18h |
-| 19 | 18/01–24/01/2027 | CLIP, ViLT, BLIP, BLIP-2; Modern Robotics Ch.10 | A05, A06 | B03 | I03; command-to-plan chạy plan-only và có golden traces | A: 24h, B: 20h |
-| 20 | 25/01–31/01/2027 | LLM Ch.3–6; Generative AI Ch.4; Modern Robotics Ch.11; Stack of Tasks | A07, A08 | B04 | I04; grounded target điều khiển fixed-foot whole body | A: 22h, B: 24h |
-| 21 | 01/02–07/02/2027 | Flamingo, MiniGPT-4, LLaVA, PaliGemma, PaLM-E; LLM Ch.7; MoveIt Servo/Hybrid; Modern Robotics Ch.12 | A09, A10 | B05, B06 | Moving-target và embodied-context demos | A: 26h, B: 24h |
-| 22 | 08/02–14/02/2027 | Generative AI Ch.1, 5, 6; verification và release hardening | A11 | B07 | I05; final demo, safety case, report và P04 episode manifest | A: 22h, B: 22h |
+| 17 | 04/01–10/01/2027 | Hiệp: CS224N Lecture 1 và 9; CS224W Lecture 5.1 và 6.1. Thông: Modern Robotics Ch.10; MoveIt planning | A01, A02 | B01 | I01; contract v1, corpus manifest, scene graph và MoveIt groups | Hiệp: 20h, Thông: 20h |
+| 18 | 11/01–17/01/2027 | Hiệp: CS224N Lecture 5, 7, 8, 9 và 11. Thông: ROS actions; MoveIt Planning Scene | A03, A04 | B02 | I02; scene graph đồng bộ collision scene, parsers có schema | Hiệp: 22h, Thông: 18h |
+| 19 | 18/01–24/01/2027 | Hiệp: CS224N Multimodal Deep Learning, CVPR VLP Tutorial, VLM/BLIP-2 tutorials. Thông: Modern Robotics Ch.10 | A05, A06 | B03 | I03; command-to-plan chạy plan-only và có golden traces | Hiệp: 24h, Thông: 20h |
+| 20 | 25/01–31/01/2027 | Hiệp: CS224N Lecture 8–11 và Efficient Training. Thông: Modern Robotics Ch.11; Stack of Tasks | A07, A08 | B04 | I04; grounded target điều khiển fixed-foot whole body | Hiệp: 22h, Thông: 24h |
+| 21 | 01/02–07/02/2027 | Hiệp: Stanford multimodal lectures, LLaVA, PaliGemma và PaLM-E videos. Thông: MoveIt Servo/Hybrid; Modern Robotics Ch.12 | A09, A10 | B05, B06 | Moving-target và embodied-context demos | Hiệp: 26h, Thông: 24h |
+| 22 | 08/02–14/02/2027 | Hiệp: NLG, benchmarking và language-model risk videos. Thông: verification và release hardening | A11 | B07 | I05; final demo, safety case, report và P04 episode manifest | Hiệp: 22h, Thông: 22h |
 
 ### Điều kiện chuyển tuần
 
@@ -882,50 +887,39 @@ Model cuối không được chọn chỉ bằng accuracy. Quyết định phả
 
 | Nguồn tài liệu | Kiến thức | Mã nhiệm vụ | Thành viên | Sản phẩm |
 |---|---|---|---|---|
-| `Chap 2.1.pptx`–`Chap 2.3.pptx` | DNN/NLP representations/applications | A01 | A | Command corpus/schema |
-| `3.1.pptx`–`3.3.pptx` | RNN, LSTM, GRU | A03 | A | Intent baselines |
-| `4.1.pptx`–`4.3.pptx` | CNN/RNN cho text | A03 | A | Sequence benchmark |
-| `5.1.pptx`–`5.3.pptx` | Seq2Seq và Attention | A04 | A | Structured parser |
-| `6.1.pptx`, `6.2.pptx` | Transformer | A04 | A | Transformer parser |
-| `7.1.pptx`–`7.3.pptx` | BERT/GPT và đánh giá | A04 | A | Parser comparison |
-| `AI-ADL-CH03.1.pdf`–`CH03.3.pdf` | Recurrent Neural Networks | A03 | A | Sequence model adapters |
-| `AI-ADL-CH04.1.pdf`–`CH04.3.pdf` | Graph Neural Network | A02 | A | Semantic scene graph |
-| `AI-ADL-CH05.1.pdf`, `CH05.2.pdf` | Graph representation | A02 | A | Graph schema/relations |
-| `AI-LLM-CH01.1.pdf`–`CH01.3.pdf` | LLM foundations | A01 | A | Evaluation protocol |
-| `AI-LLM-CH02.1.pdf`, `CH02.2.pdf` | Transformer to ChatGPT; AE/AR | A04 | A | Structured generation |
-| `AI-LLM-CH03.1.pdf`–`CH03.3.pdf` | Encoder-only | A07 | A | Model benchmark |
-| `AI-LLM-CH04.1.pdf`–`CH04.3.pdf` | Encoder-decoder | A07 | A | Model benchmark |
-| `AI-LLM-CH05.1.pdf`–`CH05.3.pdf` | Decoder-only | A07 | A | Model benchmark |
-| `AI-LLM-CH06.1.pdf`–`CH06.3.pdf` | Prompting/PEFT | A08 | A | Versioned prompt/adapter |
-| `AI-LLM-CH07.1.pdf`–`CH07.3.pdf` | Multimodal LLMs | A09 | A | VLM benchmark |
-| `AI-GenAI-CH01.1.pdf`, `CH01.2.pdf` | Generative AI overview | A11 | A | Final semantic evaluation |
-| `AI-GenAI-CH02.1.pdf`, `CH02.2.pdf` | Generative models | A10 | A | Embodied context design |
-| `AI-GenAI-CH03.1.pdf`–`CH03.3.pdf` | Content generation | A10 | A | Structured multimodal generation |
-| `AI-GenAI-CH04.1.pdf`, `CH04.2.pdf` | Evaluation/fine-tuning | A08, A11 | A | PEFT and benchmark |
-| `AI-GenAI-CH05.1.pdf`, `CH05.2.pdf` | Ethics/responsibility | I05 | Both | Safety case |
-| `AI-GenAI-CH06.1.pdf`, `CH06.2.pdf` | System integration | I01, I05 | Both | Contract/runtime integration |
-| `2103.00020.pdf` | CLIP | A05 | A | Retrieval grounding |
-| `2102.03334.pdf` | ViLT | A05 | A | Grounding comparison |
-| `2201.12086.pdf` | BLIP | A06 | A | Caption/VQA adapter |
-| `2301.12597.pdf` | BLIP-2 | A06 | A | Caption/VQA adapter |
-| `2204.14198.pdf` | Flamingo | A09 | A | Multimodal benchmark |
-| `2304.08485.pdf` | MiniGPT-4 | A09 | A | Multimodal benchmark |
-| `2310.03744.pdf` | LLaVA baseline improvements | A09 | A | Multimodal benchmark |
-| `2407.07726.pdf` | PaliGemma | A09 | A | Multimodal benchmark |
-| `2303.03378.pdf` | PaLM-E | A10 | A | Embodied input schema |
-| OpenAI CLIP repository | Official CLIP implementation | A05 | A | CLIP adapter |
-| Hugging Face image-text-to-text | VLM task API | A06, A09 | A | Standard inference adapter |
-| Hugging Face Transformers | Model/processor APIs | A07 | A | Text model adapters |
-| Modern Robotics Chapter 10 | Motion planning | B01, B02, B03 | B | MoveIt planning stack |
-| Modern Robotics Chapter 11 | Robot control | B04, B06, B07 | B | Whole-body controller |
-| Modern Robotics Chapter 12 | Manipulation | B06 | B | Point/reach semantics |
-| ROS 2 Jazzy action tutorial | Action lifecycle | I01, B02 | Both/B | Execute task action |
-| MoveIt Planning API | Pose/joint planning | B01, B03 | B | Planning adapter |
-| MoveIt Planning Scene API | Collision world | I02 | Both | Scene synchronization |
-| MoveIt Servo | Online control | B05 | B | Target servo |
-| MoveIt Hybrid Planning | Replanning | B05 | B | Hybrid planner |
-| Stack of Tasks documentation | Task hierarchy | B04 | B | Whole-body control design |
-| ros2_control JTC | Trajectory execution | B04, B07 | B | Controller integration |
+| [Stanford CS224N Lecture 1 — Intro and Word Vectors](https://www.youtube.com/watch?v=DzpHeXVSC5I) | NLP representation và word vectors | A01 | Hiệp | Command corpus/schema |
+| [Stanford CS224N Lecture 5 — Recurrent Neural Networks](https://www.youtube.com/watch?v=fyc0Jzr74y4) | RNN và sequence modeling | A03 | Hiệp | Intent baselines |
+| [Stanford CS224N Lecture 7 — Attention and LLM Intro](https://www.youtube.com/watch?v=J7ruSOIzhrE) | Seq2Seq và Attention | A04 | Hiệp | Structured parser |
+| [Stanford CS224N Lecture 8 — Self-Attention and Transformers](https://www.youtube.com/watch?v=LWMzyfvuehA) | Transformer | A04, A07 | Hiệp | Transformer parser/model benchmark |
+| [Stanford CS224N Lecture 9 — Pretraining](https://www.youtube.com/watch?v=DGfCRXuNA2w) | Encoder-only, decoder-only, encoder-decoder | A01, A04, A07 | Hiệp | LLM protocol và adapters |
+| [Stanford CS224N Lecture 10 — Prompting and RLHF](https://www.youtube.com/watch?v=SXpJ9EmG3s4) | Prompting, instruction tuning và trust boundary | I01, A08, I05 | Hiệp/Cả hai | Prompt/adapter và integration contract |
+| [Stanford CS224N Lecture 11 — Natural Language Generation](https://www.youtube.com/watch?v=N9L32bFieEY) | Language generation | A11 | Hiệp | Final semantic evaluation |
+| [Stanford CS224N Lecture 11 — Benchmarking](https://www.youtube.com/watch?v=TO0CqzqiArM) | Evaluation và benchmark design | I01, A04, A08, A11, I05 | Hiệp/Cả hai | Metrics, acceptance và report |
+| [Stanford CS224N — Efficient Training](https://www.youtube.com/watch?v=UVX7SYGCKkA) | PEFT/LoRA và efficient adaptation | A08 | Hiệp | Versioned prompt/adapter |
+| [Stanford CS224W Lecture 5.1](https://www.youtube.com/watch?v=6g9vtxUmfwM) | Graph representation và message passing | A02 | Hiệp | Graph schema/relations |
+| [Stanford CS224W Lecture 6.1](https://www.youtube.com/watch?v=F3PgltDzllc) | Graph Neural Network | A02 | Hiệp | Semantic scene graph |
+| [Stanford CS224N Lecture 16 — Multimodal Deep Learning](https://www.youtube.com/watch?v=5vfIT5LOkR0) | CLIP-style alignment và multimodal foundations | A05, A09 | Hiệp | Retrieval grounding/VLM benchmark |
+| [CVPR 2022 VLP Tutorial — Part I](https://www.youtube.com/watch?v=ce4lIytxfIo) | Image-text pretraining và ViLT-style VLP | A05 | Hiệp | Grounding comparison |
+| [Introduction to Vision Language Models](https://www.youtube.com/watch?v=2JairFgKPb4) | BLIP, Flamingo và LLaVA-style models | A06, A09 | Hiệp | Caption/VQA và multimodal adapters |
+| [BLIP-2 Tutorial](https://www.youtube.com/watch?v=uOwuvC374Co) | BLIP-2, Q-Former và inference | A06 | Hiệp | Caption/VQA adapter |
+| [LLaVA paper explained](https://www.youtube.com/watch?v=GMOREHJTbR4) | Visual instruction tuning/LLaVA | A09 | Hiệp | Multimodal benchmark |
+| [PaliGemma — Google for Developers](https://www.youtube.com/watch?v=S2C5rZ9WG-U) | PaliGemma và vision encoder integration | A09 | Hiệp | Multimodal benchmark |
+| [Stanford CS25 — Native Multimodal Intelligence](https://www.youtube.com/watch?v=NDdc39KYqDU) | Multimodal LLM architecture và generation | A09, A10 | Hiệp | VLM benchmark/embodied context |
+| [Google PaLM-E explainer](https://www.youtube.com/watch?v=fiLFF4RyyKQ) | PaLM-E và embodied multimodal context | A10 | Hiệp | Embodied input schema |
+| [Taxonomy of Risks Posed by Language Models](https://www.youtube.com/watch?v=YyE-chqnCdA) | Ethics, harms và risk taxonomy | I05 | Hiệp/Cả hai | Safety case |
+| [OpenAI CLIP repository](https://github.com/openai/CLIP) | Official CLIP implementation | A05 | Hiệp | CLIP adapter |
+| [Hugging Face image-text-to-text](https://huggingface.co/docs/transformers/tasks/image_text_to_text) | VLM task API | A06, A09 | Hiệp | Standard inference adapter |
+| [Hugging Face Transformers](https://huggingface.co/docs/transformers/index) | Model/processor APIs | A07 | Hiệp | Text model adapters |
+| [Modern Robotics Chapter 10](https://modernrobotics.northwestern.edu/nu-gm-book-resource/chapter-10-autoplay/) | Motion planning | B01, B02, B03 | Thông | MoveIt planning stack |
+| [Modern Robotics Chapter 11](https://modernrobotics.northwestern.edu/nu-gm-book-resource/chapter-11-autoplay/) | Robot control | B04, B06, B07 | Thông | Whole-body controller |
+| [Modern Robotics Chapter 12](https://modernrobotics.northwestern.edu/nu-gm-book-resource/chapter-12-autoplay/) | Manipulation | B06 | Thông | Point/reach semantics |
+| [ROS 2 Jazzy action tutorial](https://docs.ros.org/en/jazzy/Tutorials/Intermediate/Writing-an-Action-Server-Client/Py.html) | Action lifecycle | I01, B02 | Cả hai/Thông | Execute task action |
+| [MoveIt Planning API](https://moveit.picknik.ai/main/doc/examples/motion_planning_python_api/motion_planning_python_api_tutorial.html) | Pose/joint planning | B01, B03 | Thông | Planning adapter |
+| [MoveIt Planning Scene API](https://moveit.picknik.ai/main/doc/examples/planning_scene_ros_api/planning_scene_ros_api_tutorial.html) | Collision world | I02 | Cả hai | Scene synchronization |
+| [MoveIt Servo](https://moveit.picknik.ai/main/doc/examples/realtime_servo/realtime_servo_tutorial.html) | Online control | B05 | Thông | Target servo |
+| [MoveIt Hybrid Planning](https://moveit.picknik.ai/main/doc/examples/hybrid_planning/hybrid_planning_tutorial.html) | Replanning | B05 | Thông | Hybrid planner |
+| [Stack of Tasks documentation](https://stack-of-tasks.github.io/sot-doc/doxygen/HEAD/page_overview.html) | Task hierarchy | B04 | Thông | Whole-body control design |
+| [ros2_control Joint Trajectory Controller](https://control.ros.org/jazzy/doc/ros2_controllers/joint_trajectory_controller/doc/userdoc.html) | Trajectory execution | B04, B07 | Thông | Controller integration |
 
 ### Nguồn đã có nhưng không thuộc phạm vi trực tiếp của P03
 
@@ -934,14 +928,13 @@ Model cuối không được chọn chỉ bằng accuracy. Quyết định phả
 | Machine Learning Basic, Machine Learning Advanced | Kế thừa từ P01/P02 | P03 dùng model/evaluation infrastructure đã hoàn thành, không lặp lại classical ML tasks. |
 | Deep Learning Basic | Kế thừa từ P02 | Training loop, MLP/CNN foundation đã có. |
 | Computer Vision core files | Kế thừa từ P02 | P03 dùng tracks/RGB-D/scene input thay vì xây lại detector. |
-| `AI-ADL-CH01.*`, `AI-ADL-CH02.*` | Kế thừa từ P02 | CNN/YOLO thuộc perception detector của P02. |
-| `AI-GenAI-CH07.1.pdf`, `AI-GenAI-CH07.2.pdf` | Tùy chọn, không dùng | Nội dung công cụ Copilot/ChatGPT không tạo module sản phẩm bắt buộc. |
-| `2212.06817.pdf` (RT-1) | Chuyển P04 | VLA/robot policy learning. |
-| `2310.08864.pdf` (Open X-Embodiment) | Chuyển P04 | Cross-embodiment robot learning. |
-| `rt2(1).pdf` (RT-2) | Chuyển P04 | Vision-language-action policy. |
-| `pi0.pdf` | Chuyển P04 | Generalist robot policy. |
-| `2406.09246.pdf` (OpenVLA) | Chuyển P04 | Open VLA policy training/inference. |
-| `2405.12213.pdf` (Octo) | Chuyển P04 | Generalist robot policy. |
+| CNN/YOLO foundation videos đã dùng ở P02 | Kế thừa từ P02 | CNN/YOLO thuộc perception detector của P02; P03 không học lại. |
+| Tool-specific Copilot/ChatGPT tutorials | Tùy chọn, không dùng | Không tạo module sản phẩm bắt buộc trong P03. |
+| [Vision-Language-Action Models — OpenVLA, π0, RT-2, Gemini Robotics](https://www.youtube.com/watch?v=iNS7zaxWvJ8) | Chuyển P04 | Tổng quan VLA/robot policy learning. |
+| [OpenVLA — LeRobot Research Presentation #5](https://www.youtube.com/watch?v=-0s0v3q7mBk) | Chuyển P04 | Open VLA policy training/inference. |
+| [Creating Generalist Robot Models — Physical Intelligence](https://www.youtube.com/watch?v=HglhAaR4AF4) | Chuyển P04 | Generalist robot policy và π0 context. |
+| [RT-2 Robotics Transformer explained](https://www.youtube.com/watch?v=gXgmqjthrPw) | Chuyển P04 | Vision-language-action policy. |
+| [Advancing Robotics with VLA Models](https://www.youtube.com/watch?v=8uScOex5704) | Chuyển P04 | RT/Open X-Embodiment/Octo-style cross-embodiment learning. |
 | LeRobot, ACT, SmolVLA và OpenVLA docs | Chuyển P04 | Dataset, imitation learning và policy execution. |
 
 ## 10. Phân loại backlog
